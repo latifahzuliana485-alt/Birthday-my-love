@@ -45,7 +45,7 @@ footer{position:absolute;bottom:19px;left:0;right:0;color:#5f5a54;font-size:9px;
 </style>
 </head>
 <body>
-<audio id="audio" loop preload="auto" src="music.mp3"></audio>
+<iframe id="ytPlayer" title="Say You Won't Let Go by James Arthur" src="https://www.youtube.com/embed/0yW7w8F2TVA?enablejsapi=1&controls=0&playsinline=1&rel=0&loop=1&playlist=0yW7w8F2TVA" style="position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:0;bottom:0;left:0" allow="autoplay; encrypted-media"></iframe>
 <button class="music" id="musicBtn" title="Play Say You Won't Let Go" onclick="toggleMusic()">♪</button>
 
 <section class="hero">
@@ -119,14 +119,23 @@ document.getElementById('reasons').innerHTML = reasons.map((x,i) =>
   `<div class="reason"><b>${String(i+1).padStart(2,'0')}</b><span>${x}</span></div>`
 ).join('');
 
-const audio = document.getElementById('audio');
 const btn = document.getElementById('musicBtn');
-function toggleMusic(){
-  if(audio.paused) audio.play().then(()=>btn.classList.add('playing')).catch(()=>{});
-  else { audio.pause(); btn.classList.remove('playing'); }
+const yt = document.getElementById('ytPlayer');
+let musicPlaying = false;
+function ytCommand(func){
+  yt.contentWindow.postMessage(JSON.stringify({event:'command',func,args:[]}), '*');
 }
-audio.addEventListener('play',()=>btn.classList.add('playing'));
-audio.addEventListener('pause',()=>btn.classList.remove('playing'));
+function toggleMusic(){
+  if(!musicPlaying){
+    ytCommand('playVideo');
+    musicPlaying = true;
+    btn.classList.add('playing');
+  } else {
+    ytCommand('pauseVideo');
+    musicPlaying = false;
+    btn.classList.remove('playing');
+  }
+}
 function openGift(e){e.preventDefault();document.querySelector('#letter').scrollIntoView({behavior:'smooth'});}
 const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.12});
 document.querySelectorAll('.reveal').forEach(e=>obs.observe(e));
