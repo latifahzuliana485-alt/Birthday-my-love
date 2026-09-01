@@ -45,7 +45,7 @@ footer{position:absolute;bottom:19px;left:0;right:0;color:#5f5a54;font-size:9px;
 </style>
 </head>
 <body>
-<iframe id="ytPlayer" title="Say You Won't Let Go by James Arthur" src="https://www.youtube.com/embed/0yW7w8F2TVA?enablejsapi=1&controls=0&playsinline=1&rel=0&loop=1&playlist=0yW7w8F2TVA" style="position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;border:0;bottom:0;left:0" allow="autoplay; encrypted-media"></iframe>
+<audio id="bgMusic" src="music.mp3" preload="auto" loop></audio>
 <button class="music" id="musicBtn" title="Play Say You Won't Let Go" onclick="toggleMusic()">♪</button>
 
 <section class="hero">
@@ -120,23 +120,33 @@ document.getElementById('reasons').innerHTML = reasons.map((x,i) =>
 ).join('');
 
 const btn = document.getElementById('musicBtn');
-const yt = document.getElementById('ytPlayer');
+const music = document.getElementById('bgMusic');
 let musicPlaying = false;
-function ytCommand(func){
-  yt.contentWindow.postMessage(JSON.stringify({event:'command',func,args:[]}), '*');
-}
-function toggleMusic(){
+
+music.volume = 0.7;
+
+async function toggleMusic(){
   if(!musicPlaying){
-    ytCommand('playVideo');
-    musicPlaying = true;
-    btn.classList.add('playing');
+    try{
+      await music.play();
+      musicPlaying = true;
+      btn.classList.add('playing');
+      btn.textContent = '❚❚';
+    }catch(error){
+      console.log('Music could not start:', error);
+    }
   } else {
-    ytCommand('pauseVideo');
+    music.pause();
     musicPlaying = false;
     btn.classList.remove('playing');
+    btn.textContent = '♪';
   }
 }
-function openGift(e){e.preventDefault();document.querySelector('#letter').scrollIntoView({behavior:'smooth'});}
+
+function openGift(e){
+  e.preventDefault();
+  document.querySelector('#letter').scrollIntoView({behavior:'smooth'});
+}
 const obs = new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('show')}),{threshold:.12});
 document.querySelectorAll('.reveal').forEach(e=>obs.observe(e));
 </script>
